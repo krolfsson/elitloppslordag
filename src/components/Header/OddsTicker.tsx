@@ -51,7 +51,7 @@ export function OddsTicker() {
     <div className="ticker-bar relative flex items-center gap-3 overflow-hidden py-2.5 pl-4 pr-4 bg-white border-b-2 border-elit-pink/20">
       <span className="live-pill shrink-0 z-10">LIVE</span>
       <span
-        className="hidden sm:inline text-[10px] font-black uppercase tracking-widest text-ink-muted shrink-0 z-10 bg-white pr-2"
+        className="hidden sm:inline text-[10px] font-black uppercase tracking-widest text-ink shrink-0 z-10 bg-white pr-2"
         style={{ fontFamily: "var(--font-display)" }}
       >
         {ELITLOPPET_DATE_LABEL}
