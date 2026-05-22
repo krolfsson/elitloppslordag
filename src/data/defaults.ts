@@ -22,24 +22,6 @@ export const DEFAULT_TEAM_NAMES: Record<TeamId, string> = {
   yellow: "LAG 4",
 };
 
-export const TEAM_EMOJI_SUGGESTIONS = [
-  "💙",
-  "💛",
-  "🩵",
-  "💜",
-  "❤️",
-  "💚",
-  "🐴",
-  "🏆",
-  "🎉",
-  "⚡",
-  "🎯",
-  "🍻",
-  "⚽",
-  "🌽",
-  "👑",
-];
-
 export const DEFAULT_EVENT_EMOJI: Record<string, string> = {
   ol: "🍻",
   fotboll: "⚽",
@@ -49,24 +31,6 @@ export const DEFAULT_EVENT_EMOJI: Record<string, string> = {
 };
 
 export const DEFAULT_EVENT_EMOJI_FALLBACK = "🎮";
-
-export const EVENT_EMOJI_SUGGESTIONS = [
-  "🍻",
-  "⚽",
-  "🐴",
-  "🗺️",
-  "🌽",
-  "🎯",
-  "🎮",
-  "🏆",
-  "🎤",
-  "🎬",
-  "🎲",
-  "🧠",
-  "🎵",
-  "💃",
-  "🔔",
-];
 
 export const DEFAULT_TEAMS: Team[] = [
   { id: "blue", name: "LAG ADIELSSON", color: "blue", emoji: "💙" },

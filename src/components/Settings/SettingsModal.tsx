@@ -5,8 +5,6 @@ import {
   DEFAULT_EVENT_EMOJI,
   DEFAULT_EVENT_EMOJI_FALLBACK,
   DEFAULT_TEAM_EMOJI,
-  EVENT_EMOJI_SUGGESTIONS,
-  TEAM_EMOJI_SUGGESTIONS,
 } from "../../data/defaults";
 import { MAX_TEAMS, MIN_TEAMS } from "../../utils/teams";
 import { useConfirm } from "../../context/ConfirmContext";
@@ -149,7 +147,6 @@ export function SettingsModal({
                     key={`team-${team.id}-${team.emoji}`}
                     value={team.emoji}
                     fallback={DEFAULT_TEAM_EMOJI[team.id]}
-                    suggestions={TEAM_EMOJI_SUGGESTIONS}
                     onChange={(emoji) => onSetTeamEmoji(team.id, emoji)}
                     label="Lag-emoji"
                   />
@@ -219,7 +216,6 @@ export function SettingsModal({
                     key={`event-${event.id}-${event.emoji}`}
                     value={event.emoji}
                     fallback={eventEmojiFallback(event)}
-                    suggestions={EVENT_EMOJI_SUGGESTIONS}
                     onChange={(emoji) => onSetEventEmoji(event.id, emoji)}
                     label="Gren-emoji (visas i poängtabellen)"
                   />

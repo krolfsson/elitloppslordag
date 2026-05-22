@@ -5,7 +5,7 @@ import { EmojiDisplay } from "./EmojiDisplay";
 type EmojiPickerFieldProps = {
   value: string;
   fallback: string;
-  suggestions: string[];
+  suggestions?: string[];
   onChange: (emoji: string) => void;
   label?: string;
 };
@@ -52,20 +52,22 @@ export function EmojiPickerField({
           maxLength={8}
         />
       </div>
-      <div className="flex flex-wrap gap-1.5">
-        {suggestions.map((s) => (
-          <button
-            key={s}
-            type="button"
-            onClick={() => commit(s)}
-            className={`interactive w-10 h-10 rounded-xl text-xl flex items-center justify-center transition-colors
-              ${draft === s ? "bg-elit-pink text-white ring-2 ring-elit-pink/40" : "bg-[#f5f5f7] hover:bg-elit-pink-soft"}`}
-            title="Välj emoji"
-          >
-            {s}
-          </button>
-        ))}
-      </div>
+      {suggestions && suggestions.length > 0 && (
+        <div className="flex flex-wrap gap-1.5">
+          {suggestions.map((s) => (
+            <button
+              key={s}
+              type="button"
+              onClick={() => commit(s)}
+              className={`interactive w-10 h-10 rounded-xl text-xl flex items-center justify-center transition-colors
+                ${draft === s ? "bg-elit-pink text-white ring-2 ring-elit-pink/40" : "bg-[#f5f5f7] hover:bg-elit-pink-soft"}`}
+              title="Välj emoji"
+            >
+              {s}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
