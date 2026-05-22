@@ -86,23 +86,30 @@ export function ConfirmDialog({
             </p>
 
             <div className="flex flex-col-reverse sm:flex-row gap-3">
-              <PinkButton variant="outline" onClick={onCancel} className="flex-1">
+              <PinkButton
+                variant="outline"
+                onClick={onCancel}
+                className="flex-1 min-w-0 !px-4 !text-sm whitespace-nowrap"
+              >
                 {cancelLabel}
               </PinkButton>
               {isDanger ? (
                 <button
                   type="button"
                   onClick={onConfirm}
-                  className="interactive flex-1 flex items-center justify-center gap-2 rounded-2xl border-[3px] border-[#ff8c00]
+                  className="interactive flex-1 min-w-0 flex items-center justify-center gap-2 rounded-2xl border-[3px] border-[#ff8c00]
                     bg-gradient-to-b from-[#ff8c0030] to-[#ff8c0008] text-[#ff8c00] font-extrabold uppercase tracking-wide
-                    min-h-[52px] px-6 hover:bg-[#ff8c00] hover:text-white transition-colors glow-orange"
+                    min-h-[52px] px-4 text-sm whitespace-nowrap hover:bg-[#ff8c00] hover:text-white transition-colors glow-orange"
                   style={{ fontFamily: "var(--font-display)" }}
                 >
-                  <Trash2 size={20} />
-                  {confirmLabel}
+                  <Trash2 size={20} className="shrink-0" />
+                  <span>{confirmLabel}</span>
                 </button>
               ) : (
-                <PinkButton onClick={onConfirm} className="flex-1">
+                <PinkButton
+                  onClick={onConfirm}
+                  className="flex-1 min-w-0 !px-4 !text-sm whitespace-nowrap"
+                >
                   {confirmLabel}
                 </PinkButton>
               )}

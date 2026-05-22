@@ -38,7 +38,7 @@ export function PinkButton({
       onClick={onClick}
       whileHover={{ scale: 1.02, y: -1 }}
       whileTap={{ scale: 0.98 }}
-      className={`interactive flex items-center justify-center gap-2.5 w-full
+      className={`interactive flex items-center justify-center gap-2.5 w-full whitespace-nowrap
         font-extrabold uppercase tracking-wide transition-colors
         ${sizeClass} ${variantClass} ${className}`}
       style={{ fontFamily: "var(--font-display)" }}
