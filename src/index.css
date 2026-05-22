@@ -81,7 +81,6 @@ body {
   font-family: var(--font-display);
   font-weight: 700;
   flex-shrink: 0;
-  box-shadow: 0 3px 12px #e6007e50;
 }
 
 /* ── Typography ── */
