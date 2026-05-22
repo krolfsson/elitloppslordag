@@ -5,13 +5,14 @@ import { TeamIconDisplay } from "../icons/EventIcons";
 type TotalScorePanelProps = {
   teams: Team[];
   rankings: TeamTotal[];
-  totals: Record<TeamId, number>;
+  totals: Partial<Record<TeamId, number>>;
 };
 
 const teamAccent: Record<TeamId, { bar: string; bg: string }> = {
   blue: { bar: "bg-team-blue", bg: "bg-[#eff6ff]" },
   red: { bar: "bg-team-red", bg: "bg-[#fef2f2]" },
   green: { bar: "bg-team-green", bg: "bg-[#f0fdf4]" },
+  yellow: { bar: "bg-team-yellow", bg: "bg-[#fffbeb]" },
 };
 
 function RankCircle({ rank, tied }: { rank: number; tied?: boolean }) {
@@ -130,7 +131,7 @@ export function TotalScorePanel({
                 key={ranking.teamId}
                 ranking={ranking}
                 team={getTeam(ranking.teamId)}
-                total={totals[ranking.teamId]}
+                total={totals[ranking.teamId] ?? 0}
                 tied={group.tied}
                 compact={groups.length > 2 && group.items.length > 1}
               />

@@ -1,4 +1,4 @@
-export type TeamId = "blue" | "red" | "green";
+export type TeamId = "blue" | "red" | "green" | "yellow";
 
 export type Team = {
   id: TeamId;
@@ -11,12 +11,12 @@ export type GameEvent = {
   id: string;
   name: string;
   emoji: string;
-  scores: Record<TeamId, number>;
+  scores: Partial<Record<TeamId, number>>;
 };
 
-export type Placement = 1 | 2 | 3 | "tie";
+export type Placement = 1 | 2 | 3 | 4 | "tie";
 
-export type EventPlacement = Record<TeamId, Placement>;
+export type EventPlacement = Partial<Record<TeamId, Placement>>;
 
 export type TeamTotal = {
   teamId: TeamId;

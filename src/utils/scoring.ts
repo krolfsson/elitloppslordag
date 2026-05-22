@@ -6,15 +6,18 @@ import type {
   TeamTotal,
 } from "../types";
 
-const TEAM_IDS: TeamId[] = ["blue", "red", "green"];
+export function calculateEventPlacements(
+  event: GameEvent,
+  teamIds: TeamId[],
+): EventPlacement {
+  const entries = teamIds
+    .map((id) => ({
+      teamId: id,
+      score: event.scores[id] ?? 0,
+    }))
+    .sort((a, b) => b.score - a.score);
 
-export function calculateEventPlacements(event: GameEvent): EventPlacement {
-  const entries = TEAM_IDS.map((id) => ({
-    teamId: id,
-    score: event.scores[id],
-  })).sort((a, b) => b.score - a.score);
-
-  const placements: EventPlacement = { blue: 3, red: 3, green: 3 };
+  const placements: EventPlacement = {};
   const groups: { score: number; teams: TeamId[] }[] = [];
 
   for (const entry of entries) {
@@ -29,7 +32,9 @@ export function calculateEventPlacements(event: GameEvent): EventPlacement {
   let rank = 1;
   for (const group of groups) {
     const placement: Placement =
-      group.teams.length > 1 ? "tie" : (rank as 1 | 2 | 3);
+      group.teams.length > 1
+        ? "tie"
+        : (Math.min(rank, 4) as 1 | 2 | 3 | 4);
     for (const teamId of group.teams) {
       placements[teamId] = placement;
     }
@@ -39,23 +44,31 @@ export function calculateEventPlacements(event: GameEvent): EventPlacement {
   return placements;
 }
 
-export function calculateTotals(events: GameEvent[]): Record<TeamId, number> {
-  const totals: Record<TeamId, number> = { blue: 0, red: 0, green: 0 };
+export function calculateTotals(
+  events: GameEvent[],
+  teamIds: TeamId[],
+): Partial<Record<TeamId, number>> {
+  const totals = Object.fromEntries(teamIds.map((id) => [id, 0])) as Partial<
+    Record<TeamId, number>
+  >;
   for (const event of events) {
-    for (const id of TEAM_IDS) {
-      totals[id] += event.scores[id];
+    for (const id of teamIds) {
+      totals[id] = (totals[id] ?? 0) + (event.scores[id] ?? 0);
     }
   }
   return totals;
 }
 
 export function calculateOverallRanking(
-  totals: Record<TeamId, number>,
+  totals: Partial<Record<TeamId, number>>,
+  teamIds: TeamId[],
 ): TeamTotal[] {
-  const entries = TEAM_IDS.map((id) => ({
-    teamId: id,
-    total: totals[id],
-  })).sort((a, b) => b.total - a.total);
+  const entries = teamIds
+    .map((id) => ({
+      teamId: id,
+      total: totals[id] ?? 0,
+    }))
+    .sort((a, b) => b.total - a.total);
 
   const result: TeamTotal[] = [];
   let rank = 1;
@@ -90,7 +103,8 @@ export function getPlacementLabel(placement: Placement): string {
   if (placement === "tie") return "LIKA";
   if (placement === 1) return "1:a";
   if (placement === 2) return "2:a";
-  return "3:a";
+  if (placement === 3) return "3:a";
+  return "4:a";
 }
 
 export function getTieMessage(

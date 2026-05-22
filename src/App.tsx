@@ -33,6 +33,8 @@ function App() {
     setEventEmoji,
     addEvent,
     removeEvent,
+    addTeam,
+    removeTeam,
     getPlacements,
     toggleFullscreen,
   } = useGameState();
@@ -96,6 +98,10 @@ function App() {
         events={events}
         onRenameTeam={renameTeam}
         onSetTeamEmoji={setTeamEmoji}
+        onAddTeam={addTeam}
+        onRemoveTeam={removeTeam}
+        canAddTeam={teams.length < 4}
+        canRemoveTeam={teams.length > 2}
         onRenameEvent={renameEvent}
         onSetEventEmoji={setEventEmoji}
         onAddEvent={addEvent}

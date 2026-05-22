@@ -1,7 +1,5 @@
-import type { Team, TeamId } from "../../types";
+import type { Team } from "../../types";
 import { EmojiDisplay } from "../emoji/EmojiDisplay";
-
-const TEAM_NUM: Record<TeamId, number> = { blue: 1, red: 2, green: 3 };
 
 export function EventEmojiDisplay({
   emoji,
@@ -24,10 +22,10 @@ export function TeamIconDisplay({
 }
 
 export function TeamNumberBadge({
-  teamId,
+  n,
   size = "md",
 }: {
-  teamId: TeamId;
+  n: number;
   size?: "sm" | "md" | "lg";
 }) {
   const dim =
@@ -36,7 +34,7 @@ export function TeamNumberBadge({
       : size === "sm"
         ? "w-8 h-8 text-sm"
         : "w-10 h-10 text-base";
-  return <span className={`elit-badge ${dim}`}>{TEAM_NUM[teamId]}</span>;
+  return <span className={`elit-badge ${dim}`}>{n}</span>;
 }
 
 export function EventNumberBadge({

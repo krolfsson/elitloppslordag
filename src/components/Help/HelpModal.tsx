@@ -40,7 +40,7 @@ export function HelpModal({ open, onClose }: HelpModalProps) {
             <li>Placering och totalställning uppdateras automatiskt.</li>
             <li>Poäng sparas i webbläsaren vid refresh.</li>
             <li>I inställningar kan du byta emoji och namn för lag och grenar.</li>
-            <li>I inställningar kan du lägga till eller ta bort grenar.</li>
+            <li>I inställningar kan du lägga till eller ta bort lag (2–4 st) och grenar.</li>
             <li>Använd Helskärm för TV-läge.</li>
           </ul>
         </motion.div>

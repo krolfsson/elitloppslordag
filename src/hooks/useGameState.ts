@@ -3,11 +3,11 @@ import {
   DEFAULT_EVENT_EMOJI_FALLBACK,
   DEFAULT_EVENTS,
   DEFAULT_TEAM_EMOJI,
-  DEFAULT_TEAMS,
+  DEFAULT_TEAM_NAMES,
   LEGACY_STORAGE_KEY,
   STORAGE_KEY,
   normalizeEvent,
-  normalizeTeam,
+  normalizeTeamsList,
 } from "../data/defaults";
 import { normalizeEmoji } from "../utils/emoji";
 import type {
@@ -24,7 +24,14 @@ import {
   calculateTotals,
   clampScore,
 } from "../utils/scoring";
-
+import {
+  MAX_TEAMS,
+  MIN_TEAMS,
+  createEmptyScores,
+  nextAvailableTeamSlot,
+  stripTeamFromScores,
+  teamIdsFrom,
+} from "../utils/teams";
 function loadState(): Partial<AppState> | null {
   try {
     const raw =
@@ -35,6 +42,16 @@ function loadState(): Partial<AppState> | null {
   } catch {
     return null;
   }
+}
+
+function loadInitialState(): { teams: Team[]; events: GameEvent[] } {
+  const saved = loadState();
+  const teams = normalizeTeamsList(saved?.teams);
+  const teamIds = teamIdsFrom(teams);
+  const events = (saved?.events ?? DEFAULT_EVENTS).map((e, i) =>
+    normalizeEvent(e as Parameters<typeof normalizeEvent>[0], i, teamIds),
+  );
+  return { teams, events };
 }
 
 function playScoreSound() {
@@ -56,25 +73,40 @@ function playScoreSound() {
 }
 
 export function useGameState() {
-  const saved = loadState();
+  const [{ teams, events }, setState] = useState(loadInitialState);
+  const setTeams = useCallback(
+    (updater: Team[] | ((prev: Team[]) => Team[])) => {
+      setState((prev) => ({
+        ...prev,
+        teams: typeof updater === "function" ? updater(prev.teams) : updater,
+      }));
+    },
+    [],
+  );
+  const setEvents = useCallback(
+    (updater: GameEvent[] | ((prev: GameEvent[]) => GameEvent[])) => {
+      setState((prev) => ({
+        ...prev,
+        events: typeof updater === "function" ? updater(prev.events) : updater,
+      }));
+    },
+    [],
+  );
 
-  const [teams, setTeams] = useState<Team[]>(() =>
-    (saved?.teams ?? DEFAULT_TEAMS).map((t) =>
-      normalizeTeam(t as Parameters<typeof normalizeTeam>[0]),
-    ),
-  );
-  const [events, setEvents] = useState<GameEvent[]>(() =>
-    (saved?.events ?? DEFAULT_EVENTS).map((e, i) =>
-      normalizeEvent(e as Parameters<typeof normalizeEvent>[0], i),
-    ),
-  );
   const [editTarget, setEditTarget] = useState<EditTarget | null>(null);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
 
-  const totals = useMemo(() => calculateTotals(events), [events]);
-  const rankings = useMemo(() => calculateOverallRanking(totals), [totals]);
+  const teamIds = useMemo(() => teamIdsFrom(teams), [teams]);
+  const totals = useMemo(
+    () => calculateTotals(events, teamIds),
+    [events, teamIds],
+  );
+  const rankings = useMemo(
+    () => calculateOverallRanking(totals, teamIds),
+    [totals, teamIds],
+  );
 
   const saveToStorage = useCallback(() => {
     const state: AppState = { teams, events };
@@ -113,7 +145,7 @@ export function useGameState() {
     (eventId: string, teamId: TeamId, delta: number) => {
       const event = events.find((e) => e.id === eventId);
       if (!event) return;
-      const current = event.scores[teamId];
+      const current = event.scores[teamId] ?? 0;
       const next = clampScore(current + delta);
       const team = teams.find((t) => t.id === teamId);
       setEvents((prev) =>
@@ -134,17 +166,17 @@ export function useGameState() {
     setEvents((prev) =>
       prev.map((e) => ({
         ...e,
-        scores: { blue: 0, red: 0, green: 0 },
+        scores: createEmptyScores(teamIds),
       })),
     );
     addToast("Alla poäng nollställda!");
-  }, [addToast]);
+  }, [addToast, teamIds]);
 
   const renameTeam = useCallback((teamId: TeamId, name: string) => {
     setTeams((prev) =>
       prev.map((t) => (t.id === teamId ? { ...t, name: name.trim() || t.name } : t)),
     );
-  }, []);
+  }, [setTeams]);
 
   const setTeamEmoji = useCallback(
     (teamId: TeamId, emoji: string) => {
@@ -155,7 +187,7 @@ export function useGameState() {
       const team = teams.find((t) => t.id === teamId);
       addToast(`${team?.name ?? "Lag"}: ${normalized}`);
     },
-    [teams, addToast],
+    [teams, addToast, setTeams],
   );
 
   const renameEvent = useCallback((eventId: string, name: string) => {
@@ -164,7 +196,7 @@ export function useGameState() {
         e.id === eventId ? { ...e, name: name.trim() || e.name } : e,
       ),
     );
-  }, []);
+  }, [setEvents]);
 
   const setEventEmoji = useCallback(
     (eventId: string, emoji: string) => {
@@ -175,7 +207,7 @@ export function useGameState() {
       const event = events.find((e) => e.id === eventId);
       addToast(`${event?.name ?? "Gren"}: ${normalized}`);
     },
-    [events, addToast],
+    [events, addToast, setEvents],
   );
 
   const MIN_EVENTS = 1;
@@ -188,11 +220,11 @@ export function useGameState() {
         id,
         name: `Gren ${prev.length + 1}`,
         emoji: DEFAULT_EVENT_EMOJI_FALLBACK,
-        scores: { blue: 0, red: 0, green: 0 },
+        scores: createEmptyScores(teamIds),
       },
     ]);
     addToast("Ny gren tillagd!");
-  }, [addToast]);
+  }, [addToast, teamIds, setEvents]);
 
   const removeEvent = useCallback(
     (eventId: string) => {
@@ -206,12 +238,61 @@ export function useGameState() {
       setEditTarget((t) => (t?.eventId === eventId ? null : t));
       addToast(`"${removed.name}" borttagen!`);
     },
-    [events, addToast],
+    [events, addToast, setEvents],
+  );
+
+  const addTeam = useCallback(() => {
+    setTeams((prev) => {
+      if (prev.length >= MAX_TEAMS) {
+        addToast("Högst 4 lag tillåts!");
+        return prev;
+      }
+      const nextId = nextAvailableTeamSlot(prev);
+      if (!nextId) return prev;
+
+      const newTeam: Team = {
+        id: nextId,
+        name: DEFAULT_TEAM_NAMES[nextId],
+        color: nextId,
+        emoji: DEFAULT_TEAM_EMOJI[nextId],
+      };
+
+      setEvents((ev) =>
+        ev.map((e) => ({
+          ...e,
+          scores: { ...e.scores, [nextId]: e.scores[nextId] ?? 0 },
+        })),
+      );
+      addToast("Nytt lag tillagt!");
+      return [...prev, newTeam];
+    });
+  }, [addToast, setTeams, setEvents]);
+
+  const removeTeam = useCallback(
+    (teamId: TeamId) => {
+      if (teams.length <= MIN_TEAMS) {
+        addToast("Minst 2 lag måste finnas kvar!");
+        return;
+      }
+      const removed = teams.find((t) => t.id === teamId);
+      if (!removed) return;
+
+      setTeams((prev) => prev.filter((t) => t.id !== teamId));
+      setEvents((prev) =>
+        prev.map((e) => ({
+          ...e,
+          scores: stripTeamFromScores(e.scores, teamId),
+        })),
+      );
+      setEditTarget((t) => (t?.teamId === teamId ? null : t));
+      addToast(`"${removed.name}" borttaget!`);
+    },
+    [teams, addToast, setTeams, setEvents],
   );
 
   const getPlacements = useCallback(
-    (event: GameEvent) => calculateEventPlacements(event),
-    [],
+    (event: GameEvent) => calculateEventPlacements(event, teamIds),
+    [teamIds],
   );
 
   const toggleFullscreen = useCallback(() => {
@@ -243,6 +324,8 @@ export function useGameState() {
     setEventEmoji,
     addEvent,
     removeEvent,
+    addTeam,
+    removeTeam,
     getPlacements,
     toggleFullscreen,
   };

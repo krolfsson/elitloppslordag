@@ -5,10 +5,11 @@ type MedalBadgeProps = {
   placement: Placement;
 };
 
-const medalStyles: Record<1 | 2 | 3, string> = {
+const medalStyles: Record<1 | 2 | 3 | 4, string> = {
   1: "bg-elit-pink text-white ring-2 ring-elit-pink/30",
   2: "bg-[#e8e8ed] text-ink ring-2 ring-gray-200",
   3: "bg-elit-pink-light text-elit-pink-dark ring-2 ring-elit-pink/20",
+  4: "bg-[#fffbeb] text-[#b45309] ring-2 ring-amber-200",
 };
 
 export function MedalBadge({ placement }: MedalBadgeProps) {
@@ -26,7 +27,7 @@ export function MedalBadge({ placement }: MedalBadgeProps) {
     );
   }
 
-  const labels = { 1: "1:a", 2: "2:a", 3: "3:a" };
+  const labels = { 1: "1:a", 2: "2:a", 3: "3:a", 4: "4:a" };
 
   return (
     <span

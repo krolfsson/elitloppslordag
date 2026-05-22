@@ -20,6 +20,7 @@ const teamHeaderBg: Record<TeamId, string> = {
   blue: "bg-[#eff6ff]",
   red: "bg-[#fef2f2]",
   green: "bg-[#f0fdf4]",
+  yellow: "bg-[#fffbeb]",
 };
 
 export function ScoreboardTable({
@@ -71,7 +72,7 @@ export function ScoreboardTable({
         </div>
 
         {/* Team columns */}
-        {teams.map((team) => (
+        {teams.map((team, teamIndex) => (
           <div
             key={team.id}
             className="flex-1 flex flex-col min-w-0 px-2"
@@ -79,7 +80,7 @@ export function ScoreboardTable({
             <div
               className={`h-14 flex items-center justify-center gap-2 rounded-t-xl mb-2 ${teamHeaderBg[team.id]}`}
             >
-              <TeamNumberBadge teamId={team.id} size="sm" />
+              <TeamNumberBadge n={teamIndex + 1} size="sm" />
               <TeamIconDisplay team={team} />
               <span
                 className="text-bulky text-ink text-sm lg:text-base uppercase"
@@ -91,8 +92,8 @@ export function ScoreboardTable({
               {events.map((event) => (
                 <TeamCell
                   key={event.id}
-                  score={event.scores[team.id]}
-                  placement={placementsMap[event.id][team.id]}
+                  score={event.scores[team.id] ?? 0}
+                  placement={placementsMap[event.id]?.[team.id] ?? "tie"}
                   onClick={() => handleCellClick(event.id, team.id)}
                   popKey={popKeys[`${event.id}-${team.id}`] ?? 0}
                 />

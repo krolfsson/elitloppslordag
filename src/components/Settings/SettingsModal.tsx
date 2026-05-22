@@ -8,6 +8,7 @@ import {
   EVENT_EMOJI_SUGGESTIONS,
   TEAM_EMOJI_SUGGESTIONS,
 } from "../../data/defaults";
+import { MAX_TEAMS, MIN_TEAMS } from "../../utils/teams";
 import { useConfirm } from "../../context/ConfirmContext";
 import { EmojiPickerField } from "../emoji/EmojiPickerField";
 import { PinkButton } from "../ui/PinkButton";
@@ -19,6 +20,10 @@ type SettingsModalProps = {
   events: GameEvent[];
   onRenameTeam: (id: TeamId, name: string) => void;
   onSetTeamEmoji: (id: TeamId, emoji: string) => void;
+  onAddTeam: () => void;
+  onRemoveTeam: (id: TeamId) => void;
+  canAddTeam: boolean;
+  canRemoveTeam: boolean;
   onRenameEvent: (id: string, name: string) => void;
   onSetEventEmoji: (id: string, emoji: string) => void;
   onAddEvent: () => void;
@@ -33,6 +38,10 @@ export function SettingsModal({
   events,
   onRenameTeam,
   onSetTeamEmoji,
+  onAddTeam,
+  onRemoveTeam,
+  canAddTeam,
+  canRemoveTeam,
   onRenameEvent,
   onSetEventEmoji,
   onAddEvent,
@@ -43,7 +52,19 @@ export function SettingsModal({
 
   if (!open) return null;
 
-  const handleRemove = async (event: GameEvent) => {
+  const handleRemoveTeam = async (team: Team) => {
+    if (!canRemoveTeam) return;
+    const ok = await confirm({
+      title: "Ta bort lag?",
+      message: `"${team.name}" tas bort och alla poäng för laget försvinner.`,
+      confirmLabel: "Ta bort",
+      cancelLabel: "Behåll",
+      variant: "danger",
+    });
+    if (ok) onRemoveTeam(team.id);
+  };
+
+  const handleRemoveEvent = async (event: GameEvent) => {
     if (!canRemoveEvent) return;
     const ok = await confirm({
       title: "Ta bort gren?",
@@ -88,18 +109,42 @@ export function SettingsModal({
           <section className="mb-6">
             <h4 className="text-label-pink mb-3">Lag</h4>
             <div className="flex flex-col gap-3">
-              {teams.map((team) => (
+              {teams.map((team, index) => (
                 <div
                   key={team.id}
                   className="rounded-xl border-2 border-[#e8e8ed] bg-white p-3 flex flex-col gap-3"
                 >
-                  <input
-                    defaultValue={team.name}
-                    onBlur={(e) => onRenameTeam(team.id, e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border-2 border-[#e8e8ed] text-ink font-bold text-lg
-                      focus:border-elit-pink focus:outline-none focus:ring-2 focus:ring-elit-pink/20"
-                    style={{ fontFamily: "var(--font-display)" }}
-                  />
+                  <div className="flex items-center gap-2">
+                    <span className="elit-badge w-8 h-8 text-sm shrink-0">
+                      {index + 1}
+                    </span>
+                    <input
+                      defaultValue={team.name}
+                      onBlur={(e) => onRenameTeam(team.id, e.target.value)}
+                      className="flex-1 min-w-0 px-3 py-2 rounded-xl border-2 border-[#e8e8ed] text-ink font-bold text-lg
+                        focus:border-elit-pink focus:outline-none focus:ring-2 focus:ring-elit-pink/20"
+                      style={{ fontFamily: "var(--font-display)" }}
+                    />
+                    <motion.button
+                      type="button"
+                      whileHover={{ scale: canRemoveTeam ? 1.08 : 1 }}
+                      onClick={() => handleRemoveTeam(team)}
+                      disabled={!canRemoveTeam}
+                      title={
+                        canRemoveTeam
+                          ? "Ta bort lag"
+                          : `Minst ${MIN_TEAMS} lag måste finnas kvar`
+                      }
+                      className={`interactive shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-colors
+                        ${
+                          canRemoveTeam
+                            ? "text-[#ef4444] hover:bg-[#fef2f2]"
+                            : "text-ink-muted/40 cursor-not-allowed"
+                        }`}
+                    >
+                      <Trash2 size={20} />
+                    </motion.button>
+                  </div>
                   <EmojiPickerField
                     key={`team-${team.id}-${team.emoji}`}
                     value={team.emoji}
@@ -111,6 +156,24 @@ export function SettingsModal({
                 </div>
               ))}
             </div>
+            {!canRemoveTeam && (
+              <p className="text-xs text-ink-muted mt-2 m-0 font-semibold">
+                Minst {MIN_TEAMS} lag måste finnas kvar.
+              </p>
+            )}
+            {canAddTeam ? (
+              <PinkButton
+                icon={<Plus size={20} />}
+                onClick={onAddTeam}
+                className="w-full mt-3"
+              >
+                Lägg till lag
+              </PinkButton>
+            ) : (
+              <p className="text-xs text-ink-muted mt-3 m-0 font-semibold">
+                Högst {MAX_TEAMS} lag tillåts.
+              </p>
+            )}
           </section>
 
           <section className="mb-4">
@@ -135,7 +198,7 @@ export function SettingsModal({
                     <motion.button
                       type="button"
                       whileHover={{ scale: canRemoveEvent ? 1.08 : 1 }}
-                      onClick={() => handleRemove(event)}
+                      onClick={() => handleRemoveEvent(event)}
                       disabled={!canRemoveEvent}
                       title={
                         canRemoveEvent
