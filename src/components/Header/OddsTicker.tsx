@@ -66,7 +66,7 @@ export function OddsTicker() {
       </div>
 
       <span
-        className="hidden md:inline text-[10px] font-bold text-elit-pink/70 uppercase tracking-wider shrink-0 z-10 bg-white pl-2"
+        className="hidden md:inline text-[10px] font-black uppercase tracking-widest text-ink shrink-0 z-10 bg-white pl-2"
       >
         Vinnarodds
       </span>
