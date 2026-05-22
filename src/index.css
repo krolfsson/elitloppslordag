@@ -1,0 +1,181 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Fredoka", sans-serif;
+  --font-body: "Nunito", sans-serif;
+  --color-elit-pink: #e6007e;
+  --color-elit-pink-dark: #c4006a;
+  --color-elit-pink-light: #fce4f0;
+  --color-elit-pink-soft: #fdf2f8;
+  --color-surface: #ffffff;
+  --color-canvas: #f5f5f7;
+  --color-ink: #1a1a1e;
+  --color-ink-muted: #6b6b75;
+  --color-team-blue: #3b82f6;
+  --color-team-red: #ef4444;
+  --color-team-green: #22c55e;
+}
+
+@utility bg-team-blue {
+  background-color: var(--color-team-blue);
+}
+@utility bg-team-red {
+  background-color: var(--color-team-red);
+}
+@utility bg-team-green {
+  background-color: var(--color-team-green);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  cursor: none;
+}
+
+.app-cursor,
+.app-cursor * {
+  cursor: none !important;
+}
+
+/* ── Cards (bento) ── */
+.elit-card {
+  background: var(--color-surface);
+  border: 2px solid #e6007e30;
+  border-radius: 20px;
+  box-shadow: 0 4px 24px #e6007e0a, 0 1px 3px #00000008;
+}
+
+.elit-card-pink-wash {
+  background: linear-gradient(135deg, #fff 0%, #fdf2f8 100%);
+  border: 2px solid #e6007e40;
+  border-radius: 20px;
+}
+
+/* ── Pink circle badge (Elitloppet signature) ── */
+.elit-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: var(--color-elit-pink);
+  color: white;
+  font-family: var(--font-display);
+  font-weight: 700;
+  flex-shrink: 0;
+  box-shadow: 0 3px 12px #e6007e50;
+}
+
+/* ── Typography ── */
+.text-bulky {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.text-label-pink {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-elit-pink);
+}
+
+/* ── Ticker ── */
+.ticker-bar {
+  background: white;
+  border-bottom: 2px solid #e6007e20;
+}
+
+.odds-ticker-viewport {
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    black 4%,
+    black 96%,
+    transparent 100%
+  );
+}
+
+.odds-ticker-track {
+  animation: odds-scroll 90s linear infinite;
+}
+
+.odds-ticker-viewport:hover .odds-ticker-track {
+  animation-play-state: paused;
+}
+
+@keyframes odds-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* ── Team stripe accents ── */
+.team-stripe-blue {
+  border-left: 5px solid var(--color-team-blue);
+}
+.team-stripe-red {
+  border-left: 5px solid var(--color-team-red);
+}
+.team-stripe-green {
+  border-left: 5px solid var(--color-team-green);
+}
+
+/* ── Score cell hover ── */
+.score-cell {
+  background: white;
+  border: 2px solid #e8e8ed;
+  border-radius: 14px;
+  transition: all 0.15s ease;
+}
+.score-cell:hover {
+  background: var(--color-elit-pink-soft);
+  border-color: var(--color-elit-pink);
+  transform: scale(1.02);
+  box-shadow: 0 4px 16px #e6007e25;
+}
+
+/* ── LIVE pill ── */
+.live-pill {
+  background: var(--color-elit-pink);
+  color: white;
+  border-radius: 8px;
+  font-weight: 800;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  padding: 4px 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.live-pill::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: white;
+  animation: pulse-dot 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.85); }
+}
