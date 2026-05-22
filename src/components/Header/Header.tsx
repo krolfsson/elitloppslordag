@@ -9,20 +9,12 @@ type HeaderProps = {
 
 function ElitLogo() {
   return (
-    <div
-      className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0"
-      style={{
-        background: "linear-gradient(135deg, #e6007e 0%, #c4006a 100%)",
-        boxShadow: "0 4px 20px #e6007e50",
-      }}
-    >
-      <span
-        className="text-white text-3xl font-black leading-none"
-        style={{ fontFamily: "var(--font-display)" }}
-      >
-        E
-      </span>
-    </div>
+    <img
+      src="/elitloppslordag-logo.png"
+      alt="Elitloppslördag"
+      className="h-14 w-auto shrink-0 object-contain"
+      draggable={false}
+    />
   );
 }
 
